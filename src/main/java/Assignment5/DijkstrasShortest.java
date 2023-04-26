@@ -1,20 +1,21 @@
 package Assignment5;
 
 import java.util.Scanner;
+import java.util.stream.StreamSupport;
 
 public class DijkstrasShortest {
     public static void main(String[] args) {
-                                //   a  b  c  d  e  f  g  h   i  j
-        int [][] adjacencyMatrix = {{0, 0, 0, 0, 1, 0, 0, 10, 0, 0},   // a
-                                    {0, 0, 2, 0, 0, 0, 0, 0,  0, 0},   // b
-                                    {0, 0, 0, 0, 0, 0, 0, 0,  0, 0},   // c
-                                    {4, 0, 0, 0, 0, 0, 0, 1,  0, 0},   // d
-                                    {0, 0, 0, 0, 0, 3, 0, 0,  0, 0},   // e
-                                    {0, 1, 3, 0, 0, 0, 7, 0,  1, 0},   // f
-                                    {0, 0, 0, 0, 0, 0, 0, 0,  0, 0},   // g
-                                    {0, 0, 0, 0, 5, 0, 0, 0,  9, 0},   // h
-                                    {0, 0, 0, 0, 0, 0, 0, 0,  0, 2},   // i
-                                    {0, 0, 0, 0, 0, 0, 1, 0,  0, 0} }; // j
+        //   a  b  c  d  e  f  g  h   i  j
+        int[][] adjacencyMatrix = {{0, 0, 0, 0, 1, 0, 0, 10, 0, 0},   // a
+                {0, 0, 2, 0, 0, 0, 0, 0, 0, 0},   // b
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   // c
+                {4, 0, 0, 0, 0, 0, 0, 1, 0, 0},   // d
+                {0, 0, 0, 0, 0, 3, 0, 0, 0, 0},   // e
+                {0, 1, 3, 0, 0, 0, 7, 0, 1, 0},   // f
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},   // g
+                {0, 0, 0, 0, 5, 0, 0, 0, 9, 0},   // h
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 2},   // i
+                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0}}; // j
 
         boolean cont;
         do {
@@ -22,49 +23,107 @@ public class DijkstrasShortest {
             System.out.print("Enter source node: ");
             String startNode = input.nextLine();
 
-            if (!validateInput(startNode, 'a', 'j')){
+            if (!validateInput(startNode, 'a', 'j')) {
                 cont = true;
                 System.out.println("Please enter a valid source node.");
             } else {
                 cont = false;
             }
         } while (cont);
+
+        dijkstraAlgorithm(adjacencyMatrix, "d");
     }
 
 
     /**
      * validates user input is between the available nodes
+     *
      * @param sourceNode - user input, selected source node
-     * @param startNode - node char range starts at ..
-     * @param endNode - node char range ends at (inclusive)..
+     * @param startNode  - node char range starts at ..
+     * @param endNode    - node char range ends at (inclusive)..
      * @return - the source node selected is within the range available (truth value)
      */
     private static boolean validateInput(String sourceNode, char startNode, char endNode) {
-        if (sourceNode.length() != 1){
+        if (sourceNode.length() != 1) {
             return false;
         } else {
             return sourceNode.toLowerCase().charAt(0) >= startNode && sourceNode.toLowerCase().charAt(0) <= endNode;
         }
     }
 
-    private static void dijkstraAlgorithm(int[][] digraph, String source){
-        Vertice[] vertices = new Vertice[digraph.length]; // current distance of a vertice from the source
-        for (int i = 0; i < vertices.length; i++) { vertices[i] = new Vertice(); }
-        vertices[getSourceIndex(source)].distSrc = 0;
-
-        int count = 0;
-        while(count < vertices.length){
-            Vertice v = vertices[getMinVertice(vertices)];
-
-            count++;
+    private static void printArr(Vertice[] vertices){
+        System.out.print("[");
+        for (int i = 0; i < vertices.length; i++){
+            System.out.print("(" + vertices[i].name + ": " + vertices[i].distSrc + "), ");
         }
-
+        System.out.println("]");
     }
 
-    private static int getMinVertice(Vertice[] vertices){
+    private static void dijkstraAlgorithm(int[][] digraph, String source) {
+        Vertice[] vertices = new Vertice[digraph.length]; // current distance of a vertice from the source
+        String str = "a";
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i] = new Vertice(str);
+            str = Character.toString(str.charAt(0) + 1);
+        }
+        vertices[getSourceIndex(source)].distSrc = 0;
+        Vertice[] toBeChecked = vertices;
+
+        while (toBeChecked.length > 0) {
+            printArr(vertices);
+            int minVertex = getMinVertice(toBeChecked);
+            Vertice v = toBeChecked[minVertex];    // current node
+            toBeChecked = deletedNodeArray(toBeChecked, minVertex);
+            for (int i = 0; i < digraph[minVertex].length; i++) { // all the nodes
+                if (digraph[minVertex][i] > 0) { // if the node is adjacent to the current node
+                    if (vertices[i].distSrc > v.distSrc + digraph[minVertex][i]) {
+                        vertices[i].distSrc = v.distSrc + digraph[minVertex][i];
+                        vertices[i].predecessor = v;
+                    }
+                }
+            }
+        }
+
+        printResults(vertices, source);
+    }
+
+    private static void printResults(Vertice[] vertices, String source) {
+        System.out.println("|---------------------------------|");
+        for (int i = 0; i < vertices.length; i++) {
+            System.out.println("| " + vertices[i].name + " | " + getPath(vertices[i], i, source));
+        }
+        System.out.println("|---------------------------------|");
+    }
+
+    private static String getPath(Vertice vertex, int index, String source) {
+        System.err.println(vertex.name + ": " + vertex.distSrc);
+        String path = "";
+        String deliminator = " -> ";
+        Vertice current = vertex;
+        while (current.predecessor != null) {
+            path = deliminator + current.name + " " + path;
+            current = current.predecessor;
+        }
+        return source + path;
+    }
+
+    private static Vertice[] deletedNodeArray(Vertice[] vertices, int index) {
+        if (vertices.length >= 1) {
+            Vertice[] newVertices = new Vertice[vertices.length - 1];
+            for (int i = 0, k = 0; i < vertices.length; i++) {
+                if (i != index) {
+                    newVertices[k] = vertices[i];
+                    k++;
+                }
+            }
+            return newVertices;
+        } else return new Vertice[0];
+    }
+
+    private static int getMinVertice(Vertice[] vertices) {
         int min = 0;
-        for (int i = 0; i < vertices.length-2; i++) {
-            if (vertices[i].distSrc < vertices[i+1].distSrc)
+        for (int i = 0; i < vertices.length - 2; i++) {
+            if (vertices[i].distSrc < vertices[i + 1].distSrc)
                 min = i;
         }
         return min;
@@ -72,6 +131,7 @@ public class DijkstrasShortest {
 
     /**
      * return the source node's index in the digraph
+     *
      * @param source source node
      * @return source index
      */
@@ -104,6 +164,38 @@ public class DijkstrasShortest {
             case "y" -> 24;
             case "z" -> 25;
             default -> -1;
+        };
+    }
+
+    private static String getSourceName(int index) {
+        return switch (index) {
+            case 0 -> "a";
+            case 1 -> "b";
+            case 2 -> "c";
+            case 3 -> "d";
+            case 4 -> "e";
+            case 5 -> "f";
+            case 6 -> "g";
+            case 7 -> "h";
+            case 8 -> "i";
+            case 9 -> "j";
+            case 10 -> "k";
+            case 11 -> "l";
+            case 12 -> "m";
+            case 13 -> "n";
+            case 14 -> "o";
+            case 15 -> "p";
+            case 16 -> "q";
+            case 17 -> "r";
+            case 18 -> "s";
+            case 19 -> "t";
+            case 20 -> "u";
+            case 21 -> "v";
+            case 22 -> "w";
+            case 23 -> "x";
+            case 24 -> "y";
+            case 25 -> "z";
+            default -> "";
         };
     }
 }
