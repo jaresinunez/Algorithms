@@ -2,6 +2,7 @@ package Assignment5;
 
 import java.util.Scanner;
 import java.util.stream.StreamSupport;
+import java.util.Arrays;
 
 public class DijkstrasShortest {
     public static void main(String[] args) {
@@ -30,7 +31,6 @@ public class DijkstrasShortest {
                 cont = false;
             }
         } while (cont);
-
         dijkstraAlgorithm(adjacencyMatrix, "d");
     }
 
@@ -59,29 +59,32 @@ public class DijkstrasShortest {
         System.out.println("]");
     }
 
-    private static void dijkstraAlgorithm(int[][] digraph, String source) {
-        Vertice[] vertices = new Vertice[digraph.length]; // current distance of a vertice from the source
+    private static void dijkstraAlgorithm(int[][] adjacencyMatrix, String source) {
+        Vertice[] vertices = new Vertice[adjacencyMatrix.length]; // current distance of a vertice from the source
         String str = "a";
         for (int i = 0; i < vertices.length; i++) {
             vertices[i] = new Vertice(str);
             str = Character.toString(str.charAt(0) + 1);
+            
         }
         vertices[getSourceIndex(source)].distSrc = 0;
         Vertice[] toBeChecked = vertices;
 
         while (toBeChecked.length > 0) {
-            printArr(vertices);
+            //printArr(vertices); //uncomment this later
+            //smallest vertex value?
             int minVertex = getMinVertice(toBeChecked);
             Vertice v = toBeChecked[minVertex];    // current node
-            toBeChecked = deletedNodeArray(toBeChecked, minVertex);
-            for (int i = 0; i < digraph[minVertex].length; i++) { // all the nodes
-                if (digraph[minVertex][i] > 0) { // if the node is adjacent to the current node
-                    if (vertices[i].distSrc > v.distSrc + digraph[minVertex][i]) {
-                        vertices[i].distSrc = v.distSrc + digraph[minVertex][i];
+            toBeChecked = deletedNodeArray(toBeChecked, minVertex);//leftover nodes after initial is removed
+            for (int i = 0; i < adjacencyMatrix[minVertex].length; i++) { // all the nodes in the row of the node we are checking
+                if (adjacencyMatrix[minVertex][i] > 0) { // if the node is adjacent to the current node
+                    if (vertices[i].distSrc > v.distSrc + adjacencyMatrix[minVertex][i]) {
+                        vertices[i].distSrc = v.distSrc + adjacencyMatrix[minVertex][i];
                         vertices[i].predecessor = v;
                     }
                 }
             }
+            adjacencyMatrix=deletedMatrixArray(adjacencyMatrix,minVertex);
         }
 
         printResults(vertices, source);
@@ -119,9 +122,25 @@ public class DijkstrasShortest {
             return newVertices;
         } else return new Vertice[0];
     }
-
+    
+    //new method to remove a row of the adjacency matrix once it has been used
+    private static int[][] deletedMatrixArray(int[][] adjacencyMatrix, int index) {
+        if (adjacencyMatrix.length >= 1) {
+            int[][] newAdjacencyMatrix = new int[adjacencyMatrix.length-1][10];
+            for (int i = 0, k = 0; i < adjacencyMatrix.length; i++) {
+                if (i != index) {
+                    newAdjacencyMatrix[k] = adjacencyMatrix[i];
+                    k++;
+                }
+            }
+            return newAdjacencyMatrix;
+        }else return new int[0][0];
+    }
+    
     private static int getMinVertice(Vertice[] vertices) {
+        //initializing new variable
         int min = 0;
+        //for each variable compare it's distance value to the one ahead of it the smallest value gets returned
         for (int i = 0; i < vertices.length - 2; i++) {
             if (vertices[i].distSrc < vertices[i + 1].distSrc)
                 min = i;
