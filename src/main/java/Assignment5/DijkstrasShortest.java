@@ -50,6 +50,10 @@ public class DijkstrasShortest {
         }
     }
 
+    /**
+     * print the vertices array // for testing purposes
+     * @param vertices
+     */
     private static void printArr(Vertice[] vertices){
         System.out.print("[");
         for (int i = 0; i < vertices.length; i++){
@@ -58,6 +62,11 @@ public class DijkstrasShortest {
         System.out.println("]");
     }
 
+    /**
+     * given an adjacencyMatrix and a source node, determines the shortest path to reach each node from the source node
+     * @param adjacencyMatrix - 2d int array representing a directional weighted graph
+     * @param source - the name of the node from which we want to find the paths to every other node
+     */
     private static void dijkstraAlgorithm(int[][] adjacencyMatrix, String source) {
         Vertice[] vertices = new Vertice[adjacencyMatrix.length]; // current distance of a vertice from the source
         String str = "a";
@@ -91,19 +100,30 @@ public class DijkstrasShortest {
             }
             adjacencyMatrix=deletedMatrixArray(adjacencyMatrix,minVertex);
         }
-
         printResults(vertices, source);
     }
 
+    /**
+     * print the results of the dijkstraAlgorithm
+     * @param vertices - the list of vertices with their updated distances from the source node
+     * @param source - the source node
+     */
     private static void printResults(Vertice[] vertices, String source) {
         System.out.println("|---------------------------------|");
         for (int i = 0; i < vertices.length; i++) {
-            System.out.println("| " + vertices[i].name + " | " + getPath(vertices[i], i, source));
+            System.out.println("| " + vertices[i].name + " | " + getPath(vertices[i], source));
         }
         System.out.println("|---------------------------------|");
     }
 
-    private static String getPath(Vertice vertex, int index, String source) {
+    /**
+     * get the string representation of the path from the source node. Concatenates a string in reverse order of the path
+     * traversing from the desired vertex, backwards until we reach the source node.
+     * @param vertex - the node from which we want the path
+     * @param source - the source node
+     * @return - string representation of the path
+     */
+    private static String getPath(Vertice vertex, String source) {
         if(vertex.reachable){
         String path = "";
         String deliminator = " -> ";
@@ -119,6 +139,12 @@ public class DijkstrasShortest {
         }
     }
 
+    /**
+     * Returns the array with the element at the given index removed
+     * @param vertices - array of vertices we want to delete a node from
+     * @param index - the element you want to delete
+     * @return - updated array with element @index removed
+     */
     private static Vertice[] deletedNodeArray(Vertice[] vertices, int index) {
         if (vertices.length >= 1) {
             Vertice[] newVertices = new Vertice[vertices.length - 1];
@@ -145,7 +171,12 @@ public class DijkstrasShortest {
             return newAdjacencyMatrix;
         }else return new int[0][0];
     }
-    
+
+    /**
+     * returns the index at which the vertex has the least distance from the source node
+     * @param vertices - list of vertecies
+     * @return - index of the closest vertex to the source node
+     */
     private static int getMinVertice(Vertice[] vertices) {
         //initializing new variable
         int min_value=vertices[0].distSrc;
@@ -195,38 +226,6 @@ public class DijkstrasShortest {
             case "y" -> 24;
             case "z" -> 25;
             default -> -1;
-        };
-    }
-
-    private static String getSourceName(int index) {
-        return switch (index) {
-            case 0 -> "a";
-            case 1 -> "b";
-            case 2 -> "c";
-            case 3 -> "d";
-            case 4 -> "e";
-            case 5 -> "f";
-            case 6 -> "g";
-            case 7 -> "h";
-            case 8 -> "i";
-            case 9 -> "j";
-            case 10 -> "k";
-            case 11 -> "l";
-            case 12 -> "m";
-            case 13 -> "n";
-            case 14 -> "o";
-            case 15 -> "p";
-            case 16 -> "q";
-            case 17 -> "r";
-            case 18 -> "s";
-            case 19 -> "t";
-            case 20 -> "u";
-            case 21 -> "v";
-            case 22 -> "w";
-            case 23 -> "x";
-            case 24 -> "y";
-            case 25 -> "z";
-            default -> "";
         };
     }
 }
