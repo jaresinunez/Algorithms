@@ -2,7 +2,6 @@ package Assignment5;
 
 import java.util.Scanner;
 import java.util.stream.StreamSupport;
-import java.util.Arrays;
 
 public class DijkstrasShortest {
     public static void main(String[] args) {
@@ -31,7 +30,7 @@ public class DijkstrasShortest {
                 cont = false;
             }
         } while (cont);
-        dijkstraAlgorithm(adjacencyMatrix, "d");
+        dijkstraAlgorithm(adjacencyMatrix, "a");
     }
 
 
@@ -71,16 +70,16 @@ public class DijkstrasShortest {
         Vertice[] toBeChecked = vertices;
 
         while (toBeChecked.length > 0) {
-            //printArr(vertices); //uncomment this later
+            printArr(toBeChecked);
             //smallest vertex value?
             int minVertex = getMinVertice(toBeChecked);
-            Vertice v = toBeChecked[minVertex];    // current node
+            Vertice currentNode = toBeChecked[minVertex];    // current node
             toBeChecked = deletedNodeArray(toBeChecked, minVertex);//leftover nodes after initial is removed
             for (int i = 0; i < adjacencyMatrix[minVertex].length; i++) { // all the nodes in the row of the node we are checking
                 if (adjacencyMatrix[minVertex][i] > 0) { // if the node is adjacent to the current node
-                    if (vertices[i].distSrc > v.distSrc + adjacencyMatrix[minVertex][i]) {
-                        vertices[i].distSrc = v.distSrc + adjacencyMatrix[minVertex][i];
-                        vertices[i].predecessor = v;
+                    if (vertices[i].distSrc > currentNode.distSrc + adjacencyMatrix[minVertex][i]) {
+                        vertices[i].distSrc = currentNode.distSrc + adjacencyMatrix[minVertex][i];
+                        vertices[i].predecessor = currentNode;
                     }
                 }
             }
@@ -139,13 +138,16 @@ public class DijkstrasShortest {
     
     private static int getMinVertice(Vertice[] vertices) {
         //initializing new variable
-        int min = 0;
-        //for each variable compare it's distance value to the one ahead of it the smallest value gets returned
-        for (int i = 0; i < vertices.length - 2; i++) {
-            if (vertices[i].distSrc < vertices[i + 1].distSrc)
-                min = i;
+        int min_value=vertices[0].distSrc;
+        int min_index=0;
+        for (int i = 1; i < vertices.length; i++) {
+            if (vertices[i].distSrc < min_value){
+                min_value=vertices[i].distSrc;
+                min_index=i;
+            }
         }
-        return min;
+        System.out.println("Min is " + min_index);
+        return min_index;
     }
 
     /**
