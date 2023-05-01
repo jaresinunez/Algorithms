@@ -27,10 +27,10 @@ public class DijkstrasShortest {
                 cont = true;
                 System.out.println("Please enter a valid source node.");
             } else {
+                dijkstraAlgorithm(adjacencyMatrix, startNode);
                 cont = false;
             }
         } while (cont);
-        dijkstraAlgorithm(adjacencyMatrix, "a");
     }
 
 
@@ -67,6 +67,7 @@ public class DijkstrasShortest {
             
         }
         vertices[getSourceIndex(source)].distSrc = 0;
+        vertices[getSourceIndex(source)].reachable=true;
         Vertice[] toBeChecked = vertices;
 
         while (toBeChecked.length > 0) {
@@ -76,10 +77,15 @@ public class DijkstrasShortest {
             Vertice currentNode = toBeChecked[minVertex];    // current node
             toBeChecked = deletedNodeArray(toBeChecked, minVertex);//leftover nodes after initial is removed
             for (int i = 0; i < adjacencyMatrix[minVertex].length; i++) { // all the nodes in the row of the node we are checking
-                if (adjacencyMatrix[minVertex][i] > 0) { // if the node is adjacent to the current node
+                if(currentNode.distSrc==Integer.MAX_VALUE){
+                    currentNode.predecessor=null;
+                }
+                else if (adjacencyMatrix[minVertex][i] > 0) { // if the node is adjacent to the current node
+                    vertices[i].reachable=true;
                     if (vertices[i].distSrc > currentNode.distSrc + adjacencyMatrix[minVertex][i]) {
                         vertices[i].distSrc = currentNode.distSrc + adjacencyMatrix[minVertex][i];
                         vertices[i].predecessor = currentNode;
+                        
                     }
                 }
             }
@@ -98,7 +104,7 @@ public class DijkstrasShortest {
     }
 
     private static String getPath(Vertice vertex, int index, String source) {
-        System.err.println(vertex.name + ": " + vertex.distSrc);
+        if(vertex.reachable){
         String path = "";
         String deliminator = " -> ";
         Vertice current = vertex;
@@ -107,6 +113,10 @@ public class DijkstrasShortest {
             current = current.predecessor;
         }
         return source + path;
+        }
+        else{
+            return "Not reachable";
+        }
     }
 
     private static Vertice[] deletedNodeArray(Vertice[] vertices, int index) {
