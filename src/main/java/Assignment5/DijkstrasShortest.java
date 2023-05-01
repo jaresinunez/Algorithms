@@ -80,11 +80,10 @@ public class DijkstrasShortest {
         Vertice[] toBeChecked = vertices;
 
         while (toBeChecked.length > 0) {
-            printArr(toBeChecked);
             //smallest vertex value?
             int minVertex = getMinVertice(toBeChecked);
             Vertice currentNode = toBeChecked[minVertex];    // current node
-            toBeChecked = deletedNodeArray(toBeChecked, minVertex);//leftover nodes after initial is removed
+            toBeChecked = deletedNodeArray(toBeChecked, minVertex);// leftover nodes after initial is removed
             for (int i = 0; i < adjacencyMatrix[minVertex].length; i++) { // all the nodes in the row of the node we are checking
                 if(currentNode.distSrc==Integer.MAX_VALUE){
                     currentNode.predecessor=null;
@@ -187,7 +186,6 @@ public class DijkstrasShortest {
                 min_index=i;
             }
         }
-        System.out.println("Min is " + min_index);
         return min_index;
     }
 
